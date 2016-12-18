@@ -22,36 +22,29 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
     private int mDividerWidth;
     private int mDividerHeight;
-    private int mSpanCount;
 
-    private final int mOrientation;
 
     public GridItemDecoration(Context context, @DrawableRes int drawRes,
-                              @DimenRes int dividerSizeRes, int spanCount, int orientation) {
+                              @DimenRes int dividerSizeRes) {
         this(ContextCompat.getDrawable(context, drawRes), context.getResources().
-                getDimensionPixelSize(dividerSizeRes), spanCount, orientation);
+                getDimensionPixelSize(dividerSizeRes));
     }
 
     public GridItemDecoration(Context context, @DrawableRes int drawRes,
-                              @DimenRes int dividerWidthRes, @DimenRes int dividerHeightRes,
-                              int spanCount, int orientation) {
+                              @DimenRes int dividerWidthRes, @DimenRes int dividerHeightRes) {
         this(ContextCompat.getDrawable(context, drawRes), context.getResources().
                 getDimensionPixelSize(dividerWidthRes), context.getResources().
-                getDimensionPixelSize(dividerHeightRes), spanCount, orientation);
+                getDimensionPixelSize(dividerHeightRes));
     }
 
-    public GridItemDecoration(@NonNull Drawable divider, int dividerSize, int spanCount,
-                              int orientation) {
-        this(divider, dividerSize, dividerSize, spanCount, orientation);
+    public GridItemDecoration(@NonNull Drawable divider, int dividerSize) {
+        this(divider, dividerSize, dividerSize);
     }
 
-    public GridItemDecoration(@NonNull Drawable divider, int dividerWidth, int dividerHeight,
-                              int spanCount, int orientation) {
+    public GridItemDecoration(@NonNull Drawable divider, int dividerWidth, int dividerHeight) {
         mDivider = divider;
         mDividerWidth = dividerWidth;
         mDividerHeight = dividerHeight;
-        mSpanCount = spanCount;
-        mOrientation = orientation;
     }
 
     @Override
@@ -102,7 +95,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-        if (mOrientation == GridLayoutManager.VERTICAL) {
+        if (getOrientation(parent) == GridLayoutManager.VERTICAL) {
             getVerticalItemOffsets(outRect, view, parent, state);
         } else {
             getHorizontalItemOffsets(outRect, view, parent, state);
@@ -112,6 +105,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void getVerticalItemOffsets(Rect outRect, View view, RecyclerView parent,
                                         RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
+        int spanCount = getSpanCount(parent);
         GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
 
         outRect.top = 0;
@@ -123,12 +117,12 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
 
         int parentWidth = parent.getWidth();
         //每个item实际显示的宽度
-        int itemContentWidth = (parentWidth - (mSpanCount - 1) * mDividerWidth) / mSpanCount;
+        int itemContentWidth = (parentWidth - (spanCount - 1) * mDividerWidth) / spanCount;
         //每个item中预留出的边距总宽度,可能是单边有边距，可能是双边有边距
-        int itemSpacingWidth = parentWidth / mSpanCount - itemContentWidth;
+        int itemSpacingWidth = parentWidth / spanCount - itemContentWidth;
 
         int spanIndex = gridLayoutManager.getSpanSizeLookup().getSpanIndex(position,
-                mSpanCount);
+                spanCount);
         outRect.left = spanIndex * (mDividerWidth - itemSpacingWidth);
         int realItemIndexInGroup = spanIndex + gridLayoutManager.getSpanSizeLookup()
                 .getSpanSize(position) - 1;//算上跨度的index
@@ -139,6 +133,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void getHorizontalItemOffsets(Rect outRect, View view, RecyclerView parent,
                                           RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
+        int spanCount = getSpanCount(parent);
         GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
 
         outRect.left = 0;
@@ -150,12 +145,12 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
 
         int parentHeight = parent.getHeight();
         //每个item实际显示的宽度
-        int itemContentHeight = (parentHeight - (mSpanCount - 1) * mDividerHeight) / mSpanCount;
+        int itemContentHeight = (parentHeight - (spanCount - 1) * mDividerHeight) / spanCount;
         //每个item中预留出的边距总宽度,可能是单边有边距，可能是双边有边距
-        int itemSpacingHeight = parentHeight / mSpanCount - itemContentHeight;
+        int itemSpacingHeight = parentHeight / spanCount - itemContentHeight;
 
         int spanIndex = gridLayoutManager.getSpanSizeLookup().getSpanIndex(position,
-                mSpanCount);
+                spanCount);
         outRect.top = spanIndex * (mDividerHeight - itemSpacingHeight);
         int realItemIndexInGroup = spanIndex + gridLayoutManager.getSpanSizeLookup()
                 .getSpanSize(position) - 1;//算上跨度的index
@@ -172,10 +167,11 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
      * @return
      */
     private boolean isInLastGroup(int position, RecyclerView parent) {
+        int spanCount = getSpanCount(parent);
         GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
         GridLayoutManager.SpanSizeLookup spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
-        return spanSizeLookup.getSpanGroupIndex(parent.getAdapter().getItemCount() - 1, mSpanCount)
-                == spanSizeLookup.getSpanGroupIndex(position, mSpanCount);
+        return spanSizeLookup.getSpanGroupIndex(parent.getAdapter().getItemCount() - 1, spanCount)
+                == spanSizeLookup.getSpanGroupIndex(position, spanCount);
     }
 
     /**
@@ -193,7 +189,27 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         }
         GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
         return gridLayoutManager.getSpanSizeLookup().getSpanGroupIndex(parent.getAdapter()
-                .getItemCount() - 1, mSpanCount) + 1;
+                .getItemCount() - 1, getSpanCount(parent)) + 1;
+    }
+
+    private int getOrientation(RecyclerView parent) {
+        checkLayoutManager(parent);
+        return ((GridLayoutManager) parent.getLayoutManager()).getOrientation();
+    }
+
+    private int getSpanCount(RecyclerView parent) {
+        checkLayoutManager(parent);
+        return ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
+    }
+
+    private void checkLayoutManager(RecyclerView parent) {
+        if (parent.getLayoutManager() == null) {
+            throw new NullPointerException("Must set LayoutManager to RecyclerView");
+        }
+        if (!(parent.getLayoutManager() instanceof GridLayoutManager)) {
+            throw new IllegalArgumentException("Invalid LayoutManager for this ItemDecoration, " +
+                    "please set GridLayoutManager.");
+        }
     }
 
     /**

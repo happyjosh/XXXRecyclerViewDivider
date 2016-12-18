@@ -19,8 +19,11 @@ public class GridActivity extends AppCompatActivity {
         setContentView(R.layout.activity_divider);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.divider_recycler);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7, GridLayoutManager.VERTICAL,
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7,
+                GridLayoutManager.VERTICAL,
                 false);
+
+        //需要跨行
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -37,14 +40,14 @@ public class GridActivity extends AppCompatActivity {
                 }
 //
                 if (position == 82) {
-                    return 3;
+                    return 2;
                 }
                 return 1;
             }
         });
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.addItemDecoration(new GridItemDecoration(this, R.drawable.divider,
-                R.dimen.divider, R.dimen.divider, 7, GridLayoutManager.VERTICAL));
+                R.dimen.divider, R.dimen.divider));
 
         recyclerView.setAdapter(new VerticalAdapter());
     }

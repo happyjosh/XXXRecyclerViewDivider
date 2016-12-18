@@ -21,18 +21,15 @@ public class LinearItemDecoration extends RecyclerView.ItemDecoration {
 
     private final Drawable mDivider;
     private final int mDividerSize;
-    private final int mOrientation;
 
-    public LinearItemDecoration(Context context, @DrawableRes int drawRes, @DimenRes int sizeRes,
-                                int orientation) {
+    public LinearItemDecoration(Context context, @DrawableRes int drawRes, @DimenRes int sizeRes) {
         this(ContextCompat.getDrawable(context, drawRes), context.getResources().
-                getDimensionPixelSize(sizeRes), orientation);
+                getDimensionPixelSize(sizeRes));
     }
 
-    public LinearItemDecoration(@NonNull Drawable divider, int dividerSize, int orientation) {
+    public LinearItemDecoration(@NonNull Drawable divider, int dividerSize) {
         mDivider = divider;
         mDividerSize = dividerSize;
-        mOrientation = orientation;
     }
 
     @Override
@@ -41,7 +38,7 @@ public class LinearItemDecoration extends RecyclerView.ItemDecoration {
         int right;
         int top;
         int bottom;
-        if (mOrientation == LinearLayoutManager.HORIZONTAL) {
+        if (getOrientation(parent) == LinearLayoutManager.HORIZONTAL) {
             top = parent.getPaddingTop();
             bottom = parent.getHeight() - parent.getPaddingBottom();
             final int childCount = parent.getChildCount();
@@ -77,11 +74,23 @@ public class LinearItemDecoration extends RecyclerView.ItemDecoration {
             outRect.set(0, 0, 0, 0);
             return;
         }
-        if (mOrientation == LinearLayoutManager.HORIZONTAL) {
+        if (getOrientation(parent) == LinearLayoutManager.HORIZONTAL) {
             outRect.set(0, 0, mDividerSize, 0);
         } else {
             outRect.set(0, 0, 0, mDividerSize);
         }
+    }
+
+    private int getOrientation(RecyclerView parent) {
+        if (parent.getLayoutManager() == null) {
+            throw new NullPointerException("Must set LayoutManager to RecyclerView");
+        }
+        if (!(parent.getLayoutManager() instanceof LinearLayoutManager)) {
+            throw new IllegalArgumentException("Invalid LayoutManager for this ItemDecoration, " +
+                    "please set LinearLayoutManager.");
+        }
+
+        return ((LinearLayoutManager) parent.getLayoutManager()).getOrientation();
     }
 
     /**

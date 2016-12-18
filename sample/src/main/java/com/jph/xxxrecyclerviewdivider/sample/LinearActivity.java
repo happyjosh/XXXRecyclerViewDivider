@@ -22,7 +22,7 @@ public class LinearActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
                 false));
         recyclerView.addItemDecoration(new LinearItemDecoration(this, R.color.red,
-                R.dimen.divider, LinearLayoutManager.VERTICAL));
+                R.dimen.divider));
         recyclerView.setAdapter(new VerticalAdapter());
     }
 }
