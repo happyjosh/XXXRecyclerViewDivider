@@ -19,10 +19,11 @@ import android.view.View;
  */
 public class GridItemDecoration extends RecyclerView.ItemDecoration {
 
-    private Drawable mDivider;
+    private Drawable mHorizontalDivider;//横向的分割线
+    private Drawable mVerticalDivider;//纵向的分割线
     private int mDividerWidth;
     private int mDividerHeight;
-
+    private int mUnderLayerOrientation = GridLayoutManager.HORIZONTAL;//横向还是纵向的分割线在下，因为有重叠部分
 
     public GridItemDecoration(Context context, @DrawableRes int drawRes,
                               @DimenRes int dividerSizeRes) {
@@ -37,20 +38,40 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
                 getDimensionPixelSize(dividerHeightRes));
     }
 
+    public GridItemDecoration(Context context, @DrawableRes int horizontalDrawRes,
+                              @DrawableRes int verticalDrawRes, @DimenRes int dividerWidthRes,
+                              @DimenRes int dividerHeightRes) {
+        this(ContextCompat.getDrawable(context, horizontalDrawRes), ContextCompat.getDrawable(
+                context, verticalDrawRes), context.getResources().getDimensionPixelSize(
+                dividerWidthRes), context.getResources().getDimensionPixelSize(dividerHeightRes));
+    }
+
     public GridItemDecoration(@NonNull Drawable divider, int dividerSize) {
         this(divider, dividerSize, dividerSize);
     }
 
     public GridItemDecoration(@NonNull Drawable divider, int dividerWidth, int dividerHeight) {
-        mDivider = divider;
+        this(divider, divider, dividerWidth, dividerHeight);
+    }
+
+    public GridItemDecoration(@NonNull Drawable horizontalDivider,
+                              @NonNull Drawable verticalDivider, int dividerWidth,
+                              int dividerHeight) {
+        mHorizontalDivider = horizontalDivider;
+        mVerticalDivider = verticalDivider;
         mDividerWidth = dividerWidth;
         mDividerHeight = dividerHeight;
     }
 
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        drawHorizontal(c, parent, state);
-        drawVertical(c, parent, state);
+        if (mUnderLayerOrientation == GridLayoutManager.HORIZONTAL) {
+            drawHorizontal(c, parent, state);
+            drawVertical(c, parent, state);
+        } else {
+            drawVertical(c, parent, state);
+            drawHorizontal(c, parent, state);
+        }
     }
 
     private void drawHorizontal(Canvas c, RecyclerView parent, RecyclerView.State state) {
@@ -58,7 +79,6 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         int right;
         int top;
         int bottom;
-        top = parent.getPaddingTop();
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
@@ -66,9 +86,10 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
                     (RecyclerView.LayoutParams) child.getLayoutParams();
             left = child.getRight() + params.rightMargin;
             right = left + mDividerWidth;
+            top = child.getTop();
             bottom = child.getBottom() + mDividerHeight;
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(c);
+            mHorizontalDivider.setBounds(left, top, right, bottom);
+            mHorizontalDivider.draw(c);
         }
     }
 
@@ -77,7 +98,6 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         int right;
         int top;
         int bottom;
-        left = parent.getPaddingLeft();
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
@@ -85,9 +105,10 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
                     (RecyclerView.LayoutParams) child.getLayoutParams();
             top = child.getBottom() + params.bottomMargin;
             bottom = top + mDividerHeight;
+            left = child.getLeft();
             right = child.getRight() + mDividerWidth;
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(c);
+            mVerticalDivider.setBounds(left, top, right, bottom);
+            mVerticalDivider.draw(c);
         }
     }
 
@@ -227,4 +248,12 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         return true;
     }
 
+    /**
+     * 横向还是纵向的分割线在下，因为有重叠部分
+     *
+     * @param orientation
+     */
+    public void setUnderLayer(int orientation) {
+        mUnderLayerOrientation = orientation;
+    }
 }

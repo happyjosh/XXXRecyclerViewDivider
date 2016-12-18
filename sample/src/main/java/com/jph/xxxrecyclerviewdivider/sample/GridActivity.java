@@ -23,31 +23,36 @@ public class GridActivity extends AppCompatActivity {
                 GridLayoutManager.VERTICAL,
                 false);
 
-        //需要跨行
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (position == 2) {
-                    return 2;
-                }
-
-                if (position == 3) {
-                    return 3;
-                }
-
-                if (position == 6) {
-                    return 4;
-                }
+//        //需要跨行
+//        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                if (position == 2) {
+//                    return 2;
+//                }
 //
-                if (position == 82) {
-                    return 2;
-                }
-                return 1;
-            }
-        });
+//                if (position == 3) {
+//                    return 3;
+//                }
+//
+//                if (position == 6) {
+//                    return 4;
+//                }
+//                if (position == 82) {
+//                    return 2;
+//                }
+//                return 1;
+//            }
+//        });
         recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.addItemDecoration(new GridItemDecoration(this, R.drawable.divider,
-                R.dimen.divider, R.dimen.divider));
+//        recyclerView.addItemDecoration(new GridItemDecoration(this, R.drawable.divider,
+//                R.dimen.divider, R.dimen.divider));
+
+        GridItemDecoration gridItemDecoration = new GridItemDecoration(this,
+                R.drawable.divider_padding_h, R.drawable.divider_padding_v,
+                R.dimen.divider, R.dimen.divider);
+//        gridItemDecoration.setUnderLayer(GridLayoutManager.VERTICAL);
+        recyclerView.addItemDecoration(gridItemDecoration);
 
         recyclerView.setAdapter(new VerticalAdapter());
     }
