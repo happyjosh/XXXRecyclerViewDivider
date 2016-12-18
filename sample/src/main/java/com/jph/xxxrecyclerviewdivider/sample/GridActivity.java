@@ -19,10 +19,32 @@ public class GridActivity extends AppCompatActivity {
         setContentView(R.layout.activity_divider);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.divider_recycler);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 5, GridLayoutManager.VERTICAL,
-                false));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7, GridLayoutManager.VERTICAL,
+                false);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (position == 2) {
+                    return 2;
+                }
+
+                if (position == 3) {
+                    return 3;
+                }
+
+                if (position == 6) {
+                    return 4;
+                }
+//
+                if (position == 82) {
+                    return 3;
+                }
+                return 1;
+            }
+        });
+        recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.addItemDecoration(new GridItemDecoration(this, R.drawable.divider,
-                R.dimen.divider, R.dimen.divider, 5, GridLayoutManager.VERTICAL));
+                R.dimen.divider, R.dimen.divider, 7, GridLayoutManager.VERTICAL));
 
         recyclerView.setAdapter(new VerticalAdapter());
     }

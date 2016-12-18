@@ -112,6 +112,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void getVerticalItemOffsets(Rect outRect, View view, RecyclerView parent,
                                         RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
 
         outRect.top = 0;
         if (isAllowShowDivider(position, parent)) {
@@ -126,14 +127,19 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         //每个item中预留出的边距总宽度,可能是单边有边距，可能是双边有边距
         int itemSpacingWidth = parentWidth / mSpanCount - itemContentWidth;
 
-        int remainder = position % mSpanCount;//在当前行的index
-        outRect.left = remainder * (mDividerWidth - itemSpacingWidth);
-        outRect.right = (remainder + 1) * itemSpacingWidth - remainder * mDividerWidth;
+        int spanIndex = gridLayoutManager.getSpanSizeLookup().getSpanIndex(position,
+                mSpanCount);
+        outRect.left = spanIndex * (mDividerWidth - itemSpacingWidth);
+        int realItemIndexInGroup = spanIndex + gridLayoutManager.getSpanSizeLookup()
+                .getSpanSize(position) - 1;//算上跨度的index
+        outRect.right = (realItemIndexInGroup + 1) * itemSpacingWidth -
+                realItemIndexInGroup * mDividerWidth;
     }
 
     private void getHorizontalItemOffsets(Rect outRect, View view, RecyclerView parent,
                                           RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
 
         outRect.left = 0;
         if (isAllowShowDivider(position, parent)) {
@@ -148,23 +154,46 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         //每个item中预留出的边距总宽度,可能是单边有边距，可能是双边有边距
         int itemSpacingHeight = parentHeight / mSpanCount - itemContentHeight;
 
-        int remainder = position % mSpanCount;//在当前行的index
-        outRect.top = remainder * (mDividerHeight - itemSpacingHeight);
-        outRect.bottom = (remainder + 1) * itemSpacingHeight - remainder * mDividerHeight;
+        int spanIndex = gridLayoutManager.getSpanSizeLookup().getSpanIndex(position,
+                mSpanCount);
+        outRect.top = spanIndex * (mDividerHeight - itemSpacingHeight);
+        int realItemIndexInGroup = spanIndex + gridLayoutManager.getSpanSizeLookup()
+                .getSpanSize(position) - 1;//算上跨度的index
+//        int realItemIndexInGroup = position % mSpanCount;
+        outRect.bottom = (realItemIndexInGroup + 1) * itemSpacingHeight -
+                realItemIndexInGroup * mDividerHeight;
     }
 
-    private boolean isLastRow(int position, RecyclerView parent) {
-        int itemCount = parent.getAdapter().getItemCount();
-        //总行数
-        int rowCount = itemCount % mSpanCount == 0 ? itemCount / mSpanCount :
-                itemCount / mSpanCount + 1;
-        int rowIndex = position / mSpanCount;
+    /**
+     * 是否在最后一行/列
+     *
+     * @param position
+     * @param parent
+     * @return
+     */
+    private boolean isInLastGroup(int position, RecyclerView parent) {
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
+        GridLayoutManager.SpanSizeLookup spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
+        return spanSizeLookup.getSpanGroupIndex(parent.getAdapter().getItemCount() - 1, mSpanCount)
+                == spanSizeLookup.getSpanGroupIndex(position, mSpanCount);
+    }
 
-        if (rowIndex == rowCount - 1) {
-            return true;
+    /**
+     * 得到总共多少行/列
+     *
+     * @param parent
+     * @return
+     */
+    private int getGroupCount(RecyclerView parent) {
+        if (parent == null || parent.getLayoutManager() == null || parent.getAdapter() == null) {
+            return 0;
         }
-
-        return false;
+        if (parent.getAdapter().getItemCount() == 0) {
+            return 0;
+        }
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) parent.getLayoutManager();
+        return gridLayoutManager.getSpanSizeLookup().getSpanGroupIndex(parent.getAdapter()
+                .getItemCount() - 1, mSpanCount) + 1;
     }
 
     /**
@@ -175,10 +204,11 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
      * @return
      */
     protected boolean isAllowShowDivider(int position, RecyclerView parent) {
-        if (isLastRow(position, parent)) {
+        if (isInLastGroup(position, parent)) {
             //末尾不显示分割
             return false;
         }
         return true;
     }
+
 }
