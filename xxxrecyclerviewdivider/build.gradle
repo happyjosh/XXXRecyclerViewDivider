@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 3
+        versionName "1.1.1"
 
     }
     buildTypes {
@@ -31,7 +31,7 @@ dependencies {
 
 def siteUrl = 'https://github.com/happyjosh/XXXRecyclerViewDivider'      // 项目的主页
 def gitUrl = 'https://github.com/happyjosh/XXXRecyclerViewDivider'   // Git仓库的url
-version = "1.1.0"//显示的版本号，每次版本更迭需要同步更新
+version = "1.1.1"//显示的版本号，每次版本更迭需要同步更新
 group = "com.jph" // Maven Group ID for the artifact，一般填你唯一的包名
 install {
     repositories.mavenInstaller {
