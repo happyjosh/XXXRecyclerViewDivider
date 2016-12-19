@@ -45,15 +45,16 @@ public class GridActivity extends AppCompatActivity {
 //            }
 //        });
         recyclerView.setLayoutManager(gridLayoutManager);
-//        recyclerView.addItemDecoration(new GridItemDecoration(this, R.drawable.divider,
-//                R.dimen.divider, R.dimen.divider));
+        recyclerView.addItemDecoration(new GridItemDecoration(this, R.drawable.divider,
+                R.dimen.divider, R.dimen.divider));
 
-        GridItemDecoration gridItemDecoration = new GridItemDecoration(this,
-                R.drawable.divider_padding_h, R.drawable.divider_padding_v,
-                R.dimen.divider, R.dimen.divider);
+//        //给分割线设置padding
+//        GridItemDecoration gridItemDecoration = new GridItemDecoration(this,
+//                R.drawable.divider_padding_h, R.drawable.divider_padding_v,
+//                R.dimen.divider, R.dimen.divider);
 //        gridItemDecoration.setUnderLayer(GridLayoutManager.VERTICAL);
-        recyclerView.addItemDecoration(gridItemDecoration);
-
+//        recyclerView.addItemDecoration(gridItemDecoration);
+//
         recyclerView.setAdapter(new VerticalAdapter());
     }
 }
