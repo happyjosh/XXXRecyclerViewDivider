@@ -6,7 +6,7 @@ RecyclerView的分割线，支持LinearLayoutManager和GridLayoutManager
 **使用方式:**
 
 ```java
-compile 'com.jph:xxxrecyclerviewdivider:1.1.1'
+compile 'com.jph:xxxrecyclerviewdivider:1.1.3'
 ```
 
 For LieanrLayoutManager:
