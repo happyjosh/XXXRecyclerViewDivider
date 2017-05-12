@@ -53,11 +53,10 @@ For GridLayoutManager:
         recyclerView.setAdapter(new VerticalAdapter());
 ```
 对特殊的Item不显示分割线
+继承对应的ItemDecoration，重写isAllowShowDivider方法
 ```
 @Override
 protected boolean isAllowShowDivider(int position, RecyclerView parent) {
-    
-    }
     if (特殊样式的Item) {
         //特殊样式Item（比如header/footer）不显示分割线
         //一般通过得到对应的ItemType判断
